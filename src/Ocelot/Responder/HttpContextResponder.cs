@@ -42,18 +42,20 @@ namespace Ocelot.Responder
                 AddHeaderIfDoesntExist(context, new Header(httpResponseHeader.Key, httpResponseHeader.Value));
             }
 
-            var content = await response.Content.ReadAsStreamAsync();
-
-            if (response.Content.Headers.ContentLength != null)
+            await using (var content = await response.Content.ReadAsStreamAsync())
             {
-                AddHeaderIfDoesntExist(context, new Header("Content-Length", new[] { response.Content.Headers.ContentLength.ToString() }));
-            }
-
-            await using (content)
-            {
-                if (response.StatusCode != HttpStatusCode.NotModified && context.Response.ContentLength != 0)
+                if (response.Content.Headers.ContentLength != null)
                 {
-                    await content.CopyToAsync(context.Response.Body);
+                    AddHeaderIfDoesntExist(context,
+                        new Header("Content-Length", new[] {response.Content.Headers.ContentLength.ToString()}));
+                }
+
+                await using (content)
+                {
+                    if (response.StatusCode != HttpStatusCode.NotModified && context.Response.ContentLength != 0)
+                    {
+                        await content.CopyToAsync(context.Response.Body);
+                    }
                 }
             }
         }
@@ -65,18 +67,20 @@ namespace Ocelot.Responder
 
         public async Task SetErrorResponseOnContext(HttpContext context, DownstreamResponse response)
         {
-            var content = await response.Content.ReadAsStreamAsync();
-
-            if (response.Content.Headers.ContentLength != null)
+            await using (var content = await response.Content.ReadAsStreamAsync())
             {
-                AddHeaderIfDoesntExist(context, new Header("Content-Length", new[] { response.Content.Headers.ContentLength.ToString() }));
-            }
-
-            await using (content)
-            {
-                if (context.Response.ContentLength != 0)
+                if (response.Content.Headers.ContentLength != null)
                 {
-                    await content.CopyToAsync(context.Response.Body);
+                    AddHeaderIfDoesntExist(context,
+                        new Header("Content-Length", new[] {response.Content.Headers.ContentLength.ToString()}));
+                }
+
+                await using (content)
+                {
+                    if (context.Response.ContentLength != 0)
+                    {
+                        await content.CopyToAsync(context.Response.Body);
+                    }
                 }
             }
         }
