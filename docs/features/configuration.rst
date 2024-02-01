@@ -76,7 +76,7 @@ Multiple Environments
 ---------------------
 
 Like any other ASP.NET Core project Ocelot supports configuration file names such as **configuration.dev.json**, **configuration.test.json** etc. In order to implement this add the following 
-to you:
+to your code:
 
 .. code-block:: csharp
 
